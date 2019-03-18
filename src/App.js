@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { fetchRepos, getRepoCount, REPOS_PAGE_SIZE } from "./util/githubUtil.js"
+import DataViewer from "./DataViewer"
 
 class App extends Component {
 
@@ -91,6 +92,7 @@ class App extends Component {
                         <input type="text" name="max_issues" />
                     </label>
                 </form>
+                <DataViewer name={'ANTWONE_WALTERS'}/>
                 {jsonString}
             </div>
         );
