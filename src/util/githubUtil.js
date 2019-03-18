@@ -22,7 +22,7 @@ function fetchRepos(orgName, page = 1) {
         per_page: REPOS_PAGE_SIZE,
         page: page
     }).then(data => {
-        console.log('**** fetchRepos: ' + JSON.stringify(data.data[0]));
+        //console.log('**** fetchRepos: ' + JSON.stringify(data.data[0]));
         return data.data.map(repo => {
             return {
                 name: repo.name,

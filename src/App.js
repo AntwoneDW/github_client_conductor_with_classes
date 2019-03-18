@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import * from "./util/githubUtil.js"
+import { fetchRepos, getRepoCount, REPOS_PAGE_SIZE } from "./util/githubUtil.js"
 
 class App extends Component {
 
@@ -12,7 +12,7 @@ class App extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {value: '', data: { data: [] } };
+        this.state = {value: '', data: [] };
 
         this.handleChange = this.handleChange.bind(this);
     }
@@ -20,44 +20,54 @@ class App extends Component {
     handleChange(event) {
         console.log('target: ' + event.target );
         console.log('name: ' + event.target.name);
+        let fetchPromise = null;
         if(event.target.name === 'org_name'){
-            this.fetchRepos(event.target.value );
+            fetchPromise = fetchRepos(event.target.value );
         }
         if(event.target.name === 'min_star'){
-            this.fetchRepos(event.target.value );
+            fetchPromise = fetchRepos(event.target.value );
         }
         if(event.target.name === 'max_star'){
-            this.fetchRepos(event.target.value );
+            fetchPromise = fetchRepos(event.target.value );
         }
         if(event.target.name === 'max_issues'){
-            this.fetchRepos(event.target.value );
+            fetchPromise = fetchRepos(event.target.value );
+        }
+        if(fetchPromise !== null)
+        {
+            fetchPromise.then(
+                daReturn => {
+                    console.log("****> Promise Just Came Back");
+                    console.log("****> daReturn: " + daReturn.length);
+                    this.setState( {value: '', data: daReturn } );
+                }
+            );
         }
         console.log('value: ' + event.target.value);
         // this.setState({value: event.target.value});
     }
 
     componentDidMount() {
-        octokit.authenticate({
-            type: 'basic',
-            username: 'conductor-eng-candidate',
-            password: "Don't rate limit me, bro!"
-        });
-
-        const org = 'facebook';
+        const org = '';
         const page = 1;
-        const getRepoCountNum = this.getRepoCount(org);
-        console.log('**** getRepoCountNum: ' + getRepoCountNum);
-        const fetchRepo = this.fetchRepos(org, page);
-        console.log('**** fetchRepo: ' + fetchRepo);
+        const getRepoCountNum = getRepoCount(org);
+        //console.log('****> REPOS_PAGE_SIZE: ' + REPOS_PAGE_SIZE);
+        //console.log('****> getRepoCountNum: ' + getRepoCountNum);
+       fetchRepos(org, page).then(
+           daReturn => {
+               console.log("****> Promise Just Came Back");
+               console.log("****> daReturn: " + daReturn.length);
+               this.setState( {value: '', data: daReturn } );
+           }
+       );
+        //this.setState( {...this.state, data: fetchRepo } );
+        //console.log('****> fetchRepo: ' + fetchRepo);
+        //console.log('****> this.state.data: ' + this.state.data);
     }
 
     render() {
-        let list = "";
-        if(this.state.data)
-        {
-            this.state.data.data.map( dataObj =>
-                (JSON.stringify(dataObj)) )
-        }
+        console.log("----REDRAWING-----");
+        const jsonString = this.state.data ? JSON.stringify(this.state.data) : "No Data";
         return (
             <div className="App">
                 <form>
@@ -81,17 +91,7 @@ class App extends Component {
                         <input type="text" name="max_issues" />
                     </label>
                 </form>
-                <ul>
-                </ul>
-                {
-                    if(this.state.data)
-                {
-                    this.state.data.data.map( dataObj =>
-                    (JSON.stringify(dataObj)) )
-
-                })
-
-                }
+                {jsonString}
             </div>
         );
     }
